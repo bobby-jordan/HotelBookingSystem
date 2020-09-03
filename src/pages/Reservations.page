@@ -1,0 +1,106 @@
+<apex:page controller="ReservationController" showHeader="false">
+    <apex:stylesheet value="/sCSS/21.0/sprites/1297816277000/Theme3/default/gc/versioning.css"/>
+    <apex:stylesheet value="/sCSS/21.0/sprites/1297816277000/Theme3/default/gc/extended.css"/>
+    <apex:stylesheet value="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"/>
+
+    <apex:tabPanel selectedTab="Reservations" id="hostelBookingSystem">
+        <apex:tab label="Reservations" name="reservationTab" id="reservationTab">
+            <apex:form>
+
+                <apex:pageBlock id="thePb" title="Reservation Details To Search">
+                    <apex:pageblockSection id="thepbs">
+                        <apex:inputText value="{!keyWord}" required="false" id="accName"/>
+                    </apex:pageblockSection>
+                    <apex:pageblockButtons location="bottom">
+                        <apex:commandButton value="Search" action="{!searchRes}"/>
+                    </apex:pageblockButtons>
+                </apex:pageBlock>
+
+                <apex:pageBlock title="Reservation Details" id="noRec"
+                                rendered="{! IF( listReservation != null && listReservation.size ==0 , true, false)}">
+                    <apex:outputPanel>
+                        <h1>No Records Found </h1>
+                    </apex:outputPanel>
+                </apex:pageBlock>
+
+                <apex:pageblock mode="edit" tabStyle="Reservation__c" id="pageBlockId"
+                                rendered="{! IF( listReservation != null && listReservation.size >0, true, false)}">
+
+                    <apex:pageBlockSection title="Reservations"/>
+                    <br/>
+
+                    <apex:pageBlockSection collapsible="false" columns="1"/>
+                    <apex:pageBlockTable value="{!Reservations}" var="d">
+                        <apex:column headerValue="Reservation Name">
+                            <apex:outputField value="{!d.name}"/>
+                        </apex:column>
+                        <apex:column headerValue="Room Name">
+                            <apex:outputField value="{!d.Room__r.Name}"/>
+                        </apex:column>
+                        <apex:column headerValue="Release Date">
+                            <apex:outputField value="{!d.Release_Date__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="Date Occupied">
+                            <apex:outputField value="{!d.Date_Occupied__c}"/>
+                        </apex:column>
+                        <apex:column headerValue="Duration">
+                            <apex:outputField value="{!d.Duration__c}"/>
+                        </apex:column>
+
+                        <apex:column headerValue="Delete">
+                            <apex:commandLink value="Delete" action="{!remove}">
+                                <apex:param name="id"
+                                            value="{!d.Id}"/>
+                            </apex:commandLink>
+                        </apex:column>
+                        <apex:column headerValue="Edit">
+                            <apex:commandLink value="Edit" action="{!editReservation}">
+                                <apex:param name="id"
+                                            value="{!d.Id}"/>
+                            </apex:commandLink>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                    <apex:commandButton value="Rerender" reRender="mid" oncomplete="initPageBlockTableEnhancerADV()"/>
+                    æ
+                    <apex:pageblockButtons location="bottom">
+                        <apex:commandButton value="First Page" rerender="pageBlockId" action="{!FirstPage}"
+                                            disabled="{!prev}"/>
+                        <apex:commandButton value="Previous" rerender="pageBlockId" action="{!previous}"
+                                            disabled="{!prev}"/>
+                        <apex:commandButton value="Next" rerender="pageBlockId" action="{!next}" disabled="{!nxt}"/>
+                        <apex:commandButton value="Last Page" rerender="pageBlockId" action="{!LastPage}"
+                                            disabled="{!nxt}"/>
+                    </apex:pageblockButtons>
+                </apex:pageblock>
+            </apex:form>
+            <apex:form>
+                <apex:pageBlock mode="edit" tabStyle="Reservation__c">
+                    <apex:pageblocksection title="New Reservation" columns="1">
+                        <apex:inputField value="{!reservation.Name}"/>
+                        <apex:inputField value="{!reservation.Room__c}"/>
+                        <apex:inputField value="{!reservation.Date_Occupied__c}"/>
+                        <apex:inputField value="{!reservation.Release_Date__c}"/>
+                        <apex:commandButton value="Save reservation" action="{!saveReservation}">
+                        </apex:commandButton>
+                    </apex:pageblocksection>
+                </apex:pageBlock>
+            </apex:form>
+        </apex:tab>
+        <apex:tab label="Rooms" name="roomTab" id="roomTab">
+            <apex:pageblock mode="edit" tabStyle="Room__c">
+                <apex:pageblocksection title="Room Information" collapsible="true">
+                    <apex:pageBlockTable value="{!listRooms}" var="d">
+                        <apex:column value="{!d.Name}"/>
+                        <apex:column value="{!d.isAvailable__c}"/>
+                    </apex:pageBlockTable>
+                </apex:pageblocksection>
+            </apex:pageblock>
+        </apex:tab>
+        <apex:tab label="Dashboard" name="dashboardTab" id="dashboardTab">
+            <apex:chart height="350" width="450" data="{!pieData}">
+                <apex:pieSeries dataField="data" labelField="name"/>
+                <apex:legend position="right"/>
+            </apex:chart>
+        </apex:tab>
+    </apex:tabPanel>
+</apex:page>
